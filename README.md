@@ -1,2 +1,2 @@
 # LM15SGFNZ07
-Library for LM15SGFNZ07 display found in Siemens M55, C60,
+Raspberry Pi library for LM15SGFNZ07 display from the following Siemens phones: M55, S55, C60, MC60, A65.
