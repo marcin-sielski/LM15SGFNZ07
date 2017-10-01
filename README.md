@@ -1,5 +1,5 @@
 # LM15SGFNZ07
-Raspberry Pi library for LM15SGFNZ07 display that comes with one of the following Siemens phones: M55, S55, C60, MC60, A65.
+Raspberry Pi library for LM15SGFNZ07 display that comes with the following Siemens phones: M55, S55, C60, MC60, A65.
 
 The library is based on:
 - [Arduino based LM15SGFNZ07 library that uses GPIO interface](https://bitbucket.org/mindogas/lm15sgfnz07).
