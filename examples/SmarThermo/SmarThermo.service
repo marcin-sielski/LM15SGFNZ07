@@ -1,0 +1,15 @@
+[Unit]
+Description=SmarThermo service
+After=syslog.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/usr/bin
+ExecStart=/usr/bin/SmarThermo -c /home/pi/.SmarThermo
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
