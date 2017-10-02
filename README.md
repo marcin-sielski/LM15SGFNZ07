@@ -30,10 +30,10 @@ cd LM15SGFNZ07
 make
 ```
 In order to be able to run **_SmarThermo_** example create an account on
-[Open Weather Map Service](http://openweathermap.org/), obtain the ApiId and create `/home/pi/.SmarThermo` file with
+[Open Weather Map Service](http://openweathermap.org/), obtain the API key and create `/home/pi/.SmarThermo` file with
 following content:
 ```
-ApiId XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ApiKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Location CityName,CountryCode      
 ```
 Install the library and the examples:

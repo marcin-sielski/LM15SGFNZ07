@@ -72,7 +72,7 @@ int main (int argc, char *argv[]) {
         case 'h':
         case '?':
         default: /* '?' */
-            cerr << "Usage: " << argv[0] << " [-k ApiId] [-l Location] [-c Config]" << endl;
+            cerr << "Usage: " << argv[0] << " [-k ApiKey] [-l Location] [-c Config]" << endl;
             exit(EXIT_FAILURE);
         }
     }
@@ -90,7 +90,7 @@ int main (int argc, char *argv[]) {
                 istringstream issLine(line);
                 string key;
                 if (getline(issLine, key, ' ')) {
-                    if (!key.compare("ApiId")) {
+                    if (!key.compare("ApiKey")) {
                         if (getline(issLine, sApiId)) {
                             apiId = sApiId.c_str();
                         }
@@ -105,7 +105,7 @@ int main (int argc, char *argv[]) {
         }
     }
     if (apiId == NULL || location == NULL) {
-        cerr << "Usage: " << argv[0] << " [-k ApiId] [-l Location] [-c Config]" << endl;
+        cerr << "Usage: " << argv[0] << " [-k ApiKey] [-l Location] [-c Config]" << endl;
         exit(EXIT_FAILURE);
     }
     if (signal(SIGINT, signalHandler) == SIG_ERR) {
