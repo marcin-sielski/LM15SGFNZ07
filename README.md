@@ -4,13 +4,13 @@
 Raspberry Pi library for LM15SGFNZ07 display that comes with the following Siemens phones: M55, S55, C60, MC60, A65.
 
 The library is based on:
-- [GPIO LM15SGFNZ07 library for Arduino](https://bitbucket.org/mindogas/lm15sgfnz07).
-- [SPI LM15SGFNZ07 library for Arduino](https://github.com/DhrBaksteen/Arduino-SPI-LM15SGFNZ07-LCD-Library).
+- [GPIO LM15SGFNZ07 library for Arduino](https://bitbucket.org/mindogas/lm15sgfnz07),
+- [SPI LM15SGFNZ07 library for Arduino](https://github.com/DhrBaksteen/Arduino-SPI-LM15SGFNZ07-LCD-Library),
 
 and has been ported to Raspberry Pi.
 
 ## Installation
-Make sure 'git' is installed on the Raspberry Pi alon with the latest packages:
+Make sure `git` is installed on the Raspberry Pi along with the latest packages:
 ```
 sudo apt-get update
 sudo apt-get upgrade
@@ -30,7 +30,7 @@ cd LM15SGFNZ07
 make
 ```
 In order to be able to run SmarThermo example create account on http://openweathermap.org/, obtain the ApiId and create
-/home/pi/.SmarThermo with following content:
+`/home/pi/.SmarThermo` with following content:
 ```
 ApiId XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Location CityName,CountryCode      
