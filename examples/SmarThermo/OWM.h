@@ -32,11 +32,11 @@ class OWM {
         bool loadForecastData();
         double getTemperatureNight();
         double getTemperatureDay();
-        void getImageBitmapNight(unsigned short color, unsigned short *bitmap); 
-        void getImageBitmapDay(unsigned short color, unsigned short *bitmap); 
+        bool getImageBitmapNight(unsigned short color, unsigned short *bitmap); 
+        bool getImageBitmapDay(unsigned short color, unsigned short *bitmap); 
 
     private:
-        void getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap); 
+        bool getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap); 
 
 };
 

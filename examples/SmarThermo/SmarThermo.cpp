@@ -134,14 +134,16 @@ int main (int argc, char *argv[]) {
                 lcd.clearAll(BACKGROUND_COLOR);
             }
             if (result) {
+                if (service.getImageBitmapNight(BACKGROUND_COLOR, bitmap)) {
+                    lcd.drawBitmap(0,31,50,50, bitmap);
+                }
                 snprintf(temperature, 8, "%.1f C", service.getTemperatureNight());
-                service.getImageBitmapNight(BACKGROUND_COLOR, bitmap);
-                lcd.drawBitmap(0,31,50,50, bitmap);
                 lcd.drawString(temperature, 13, 71, YELLOW, BACKGROUND_COLOR);
 
+                if (service.getImageBitmapDay(BACKGROUND_COLOR, bitmap)) {
+                    lcd.drawBitmap(51,31,50,50, bitmap);
+                }
                 snprintf(temperature, 8, "%.1f C", service.getTemperatureDay());
-                service.getImageBitmapDay(BACKGROUND_COLOR, bitmap);
-                lcd.drawBitmap(51,31,50,50, bitmap);
                 lcd.drawString(temperature, 64, 71, YELLOW, BACKGROUND_COLOR);
             
                 lcd.drawLine(0, 39, 100, 39, YELLOW);

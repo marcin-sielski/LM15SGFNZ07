@@ -42,7 +42,8 @@ OWM::OWM(const char *apiId, const char *location) {
  * Load forecast temperature.
  * 
  * Returns:
- *     Forecast temperature. 
+ *     true  - if operation was successfull,
+ *     false - otherwise.
  */
 bool OWM::loadForecastData() {
 
@@ -59,13 +60,14 @@ bool OWM::loadForecastData() {
     int tm_year = 0;
     time_t rawTime = 0;
     size_t i = 0;
-    unsigned int timeout = 0;
+    unsigned int timeout = 10000;
     
     snprintf(url, 128, webEndpoint, this->location, this->apiId);
-    while(!endpoint.requestJson(url, &jsonResponse) && timeout < 10000) timeout++;
-    if (timeout == 10000) {
+    while(!endpoint.requestJson(url, &jsonResponse) && timeout) timeout--;
+    if (!timeout) {
         return false;
     }
+    
     jsonList = json_object_get(jsonResponse, "list");
     jsonListSize = json_array_size(jsonList);
     
@@ -91,7 +93,6 @@ bool OWM::loadForecastData() {
     jsonObject = json_object_get(jsonElement, "icon");
     snprintf(this->iconNight, 4, json_string_value(jsonObject));
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     for (; i < jsonListSize; i++) {
         jsonElement = json_array_get(jsonList, i);
         jsonObject = json_object_get(jsonElement, "dt");
@@ -145,10 +146,14 @@ double OWM::getTemperatureDay() {
  * 
  * color  - Background color,
  * bitmap - Pointer to the buffer where the bitmap is to be stored.
+ * 
+ * Returns:
+ *     true  - if operation was successfull,
+ *     false - otherwise.
  */
-void OWM::getImageBitmapNight(unsigned short color, unsigned short *bitmap) {
+bool OWM::getImageBitmapNight(unsigned short color, unsigned short *bitmap) {
 
-    this->getImageBitmap(this->iconNight, color, bitmap);
+    return this->getImageBitmap(this->iconNight, color, bitmap);
 
 }
 
@@ -157,10 +162,14 @@ void OWM::getImageBitmapNight(unsigned short color, unsigned short *bitmap) {
  * 
  * color - Background color,
  * bitmap - Pointer to the buffer where the bitmap is to be stored.
+ * 
+ * Returns:
+ *     true  - if operation was successfull,
+ *     false - otherwise.
  */
-void OWM::getImageBitmapDay(unsigned short color, unsigned short *bitmap) {
+bool OWM::getImageBitmapDay(unsigned short color, unsigned short *bitmap) {
     
-    this->getImageBitmap(this->iconDay, color, bitmap);
+    return this->getImageBitmap(this->iconDay, color, bitmap);
 
 }
 
@@ -171,8 +180,12 @@ void OWM::getImageBitmapDay(unsigned short color, unsigned short *bitmap) {
  * image  - Image to get,
  * color  - Background color,
  * bitmap - Pointer to the buffer where the bitmap is to be stored.
+ * 
+ * Returns:
+ *     true  - if operation was successfull,
+ *     false - otherwise.
  */
-void OWM::getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap) {
+bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap) {
     
     char url[128];
     Buffer fileResponse(256 * 1024);
@@ -190,39 +203,55 @@ void OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     png_bytep row;
     png_bytep px;
     png_byte alpha;
+    bool returnValue = true;
+    unsigned int timeout = 10000;
+    
+    if (!image) {
+        return false;
+    }
     
     snprintf(url, 128, imageEndpoint, image);
-    while(!endpoint.requestFile(url, &fileResponse));
+    while(!endpoint.requestFile(url, &fileResponse) && timeout) timeout --;
+    if (!timeout) {
+        return false;
+    }
+    
     do {
         fd = shm_open("icon", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
         if (-1 == fd) {
             cerr << "Error: Failed to open shared memory file (errno = " << errno << ")." << endl;
+            returnValue = false;
             break;
         }
         result = fallocate(fd, 0, 0, fileResponse.getSize());
         if (-1 == result) {
             cerr << "Error: Failed to allocate shared memory file (errno = " << errno << ")." << endl;
+            returnValue = false;
             break;
         }
         data = (char *)mmap(NULL, fileResponse.getSize(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (-1 == *data) {
             cerr << "Error: Failed to map shared memory file (errno = " << errno << ")." << endl;
+            returnValue = false;
             break;
         }
         memcpy(data, fileResponse.getData(), fileResponse.getSize());
         fp = fdopen(fd, "rwb");
         if (!fp) {
             cerr << "Error: Failed to open file (errno = " << errno << ")." << endl;
+            returnValue = false;
             break;
         }
         png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
         if (!png) {
             cerr << "Error: Failed to create PNG structure." << endl;
+            returnValue = false;
             break;
         }
         info = png_create_info_struct(png);
         if (!info) {
             cerr << "Error: Failed to create info structure." << endl;
+            returnValue = false;
             break;
         }
         png_init_io(png, fp);
@@ -267,4 +296,7 @@ void OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     if (-1 != fd) {
         shm_unlink("icon");
     }
+    
+    return returnValue;
+    
 }
