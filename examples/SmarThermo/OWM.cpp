@@ -44,7 +44,7 @@ OWM::OWM(const char *apiId, const char *location) {
  * Returns:
  *     Forecast temperature. 
  */
-void OWM::loadForecastData() {
+bool OWM::loadForecastData() {
 
     char url[128];
     json_t *jsonResponse = NULL;
@@ -59,16 +59,21 @@ void OWM::loadForecastData() {
     int tm_year = 0;
     time_t rawTime = 0;
     size_t i = 0;
+    unsigned int timeout = 0;
+    
+    snprintf(url, 128, webEndpoint, this->location, this->apiId);
+    while(!endpoint.requestJson(url, &jsonResponse) && timeout < 10000) timeout++;
+    if (timeout == 10000) {
+        return false;
+    }
+    jsonList = json_object_get(jsonResponse, "list");
+    jsonListSize = json_array_size(jsonList);
     
     rawTime = time(NULL);
     timeInfo = localtime(&rawTime);
     tm_yday = timeInfo->tm_yday;
     tm_year = timeInfo->tm_year;
-    snprintf(url, 128, webEndpoint, this->location, this->apiId);
-    while(!endpoint.requestJson(url, &jsonResponse));
-    jsonList = json_object_get(jsonResponse, "list");
-    jsonListSize = json_array_size(jsonList);
-    
+
     for (; i < jsonListSize; i++) {
         jsonElement = json_array_get(jsonList, i);
         jsonObject = json_object_get(jsonElement, "dt");
@@ -106,6 +111,7 @@ void OWM::loadForecastData() {
     
     json_decref(jsonResponse);
 
+    return true;
 
 }
 

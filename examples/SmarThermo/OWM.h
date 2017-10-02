@@ -29,7 +29,7 @@ class OWM {
         
     public:
         OWM(const char *apiId, const char *location);
-        void loadForecastData();
+        bool loadForecastData();
         double getTemperatureNight();
         double getTemperatureDay();
         void getImageBitmapNight(unsigned short color, unsigned short *bitmap); 

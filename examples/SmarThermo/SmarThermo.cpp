@@ -55,6 +55,7 @@ int main (int argc, char *argv[]) {
     const char *location = NULL;
     const char *config = NULL;
     unsigned int indentation = 0;
+    bool result = false;
 
     // Parse arguments
     while ((opt = getopt(argc, argv, "k:l:c:h?")) != -1) {
@@ -128,22 +129,24 @@ int main (int argc, char *argv[]) {
     temp = thermometer.read();
     while(1) {
         if (!(counter % 60)) {
-            service.loadForecastData();
+            result = service.loadForecastData();
             if (counter == 0) {
                 lcd.clearAll(BACKGROUND_COLOR);
             }
-            snprintf(temperature, 8, "%.1f C", service.getTemperatureNight());
-            service.getImageBitmapNight(BACKGROUND_COLOR, bitmap);
-            lcd.drawBitmap(0,31,50,50, bitmap);
-            lcd.drawString(temperature, 13, 71, YELLOW, BACKGROUND_COLOR);
+            if (result) {
+                snprintf(temperature, 8, "%.1f C", service.getTemperatureNight());
+                service.getImageBitmapNight(BACKGROUND_COLOR, bitmap);
+                lcd.drawBitmap(0,31,50,50, bitmap);
+                lcd.drawString(temperature, 13, 71, YELLOW, BACKGROUND_COLOR);
 
-            snprintf(temperature, 8, "%.1f C", service.getTemperatureDay());
-            service.getImageBitmapDay(BACKGROUND_COLOR, bitmap);
-            lcd.drawBitmap(51,31,50,50, bitmap);
-            lcd.drawString(temperature, 64, 71, YELLOW, BACKGROUND_COLOR);
+                snprintf(temperature, 8, "%.1f C", service.getTemperatureDay());
+                service.getImageBitmapDay(BACKGROUND_COLOR, bitmap);
+                lcd.drawBitmap(51,31,50,50, bitmap);
+                lcd.drawString(temperature, 64, 71, YELLOW, BACKGROUND_COLOR);
             
-            lcd.drawLine(0, 39, 100, 39, YELLOW);
-            lcd.drawLine(50, 40, 50, 79, YELLOW);
+                lcd.drawLine(0, 39, 100, 39, YELLOW);
+                lcd.drawLine(50, 40, 50, 79, YELLOW);
+            }
         }
         time(&rawtime);
         timeinfo = localtime(&rawtime);
