@@ -33,7 +33,6 @@ class WebService {
 	static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 	bool request(const char *url, Buffer *buffer);
 
-    
 };
 
 #endif

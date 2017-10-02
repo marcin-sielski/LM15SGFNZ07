@@ -21,7 +21,6 @@ class OneWire {
     OneWire(int pin);
     void initialize();
     double read();
-
     
 };
 

@@ -23,6 +23,7 @@
  *  10 (LED2)       3.3v
  */
 
+#include <wiringPi.h>
 #include <LM15SGFNZ07.h>
 #include "icon.h"
 

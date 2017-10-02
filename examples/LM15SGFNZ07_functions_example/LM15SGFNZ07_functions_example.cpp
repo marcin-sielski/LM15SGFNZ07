@@ -5,10 +5,9 @@
  *  Copyright (C) 2017 Marcin Sielski
  */
 
+#include <wiringPi.h>
 #include <LM15SGFNZ07.h>
-/*#include <ctime>
-#include <cstdio>
-*/
+
 LM15SGFNZ07 lcd(17,22,5,6,26); //configing lcd conectivity
 
 void setup() {

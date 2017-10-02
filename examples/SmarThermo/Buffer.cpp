@@ -17,9 +17,11 @@
  * maxSize - Maximal buffer size.
  */
 Buffer::Buffer(unsigned int maxSize) {
+
     this->size = 0;
     this->maxSize = maxSize;
     this->buffer = new char [maxSize];
+
 }
 
 /**
@@ -29,7 +31,9 @@ Buffer::Buffer(unsigned int maxSize) {
  *     Pointer to the data in the buffer. 
  */
 char *Buffer::getData() {
+
     return this->buffer;
+
 }
 
 /**
@@ -39,7 +43,9 @@ char *Buffer::getData() {
  *     Current buffer size. 
  */
 unsigned int Buffer::getSize() {
+
     return this->size;
+
 }
 
 /**
@@ -48,7 +54,9 @@ unsigned int Buffer::getSize() {
  * size - Size to set for the buffer.
  */
 void Buffer::setSize(unsigned int size) {
+
     this->size = size;
+
 }
 
 /**
@@ -58,7 +66,9 @@ void Buffer::setSize(unsigned int size) {
  *     Maximal buffer size.
  */
 unsigned int Buffer::getMaxSize() {
+
     return this->maxSize;
+
 }
 
 /**
@@ -68,14 +78,18 @@ unsigned int Buffer::getMaxSize() {
  *     Buffer data in JSON object. 
  */
 json_t *Buffer::jsonLoads() {
+
     json_error_t error;
     this->buffer[this->size] = 0;
     return json_loads(this->buffer, 0, &error);
+
 }
 
 /**
  * Buffer destructor. 
  */
 Buffer::~Buffer() {
+
     delete [] this->buffer;
+
 }

@@ -13,8 +13,6 @@
 #ifndef LM15SGFNZ07_H
 #define LM15SGFNZ07_H
 
-#include <wiringPi.h>
-
 // Colors definitions
 enum {
     BLACK        = 0x000,
