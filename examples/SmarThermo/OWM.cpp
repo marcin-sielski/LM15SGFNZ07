@@ -15,8 +15,11 @@
 #include <errno.h>
 #include <cstring>
 #include <png.h>
+#include <iostream>
 
 #include "OWM.h"
+
+using namespace std;
 
 /**
  * OWM constructor.
@@ -32,7 +35,6 @@ OWM::OWM(const char *apiId, const char *location) {
     this->temperatureDay = 0;
     this->iconNight[0] = 0;
     this->iconDay[0] = 0;
-
 
 }
 
@@ -56,6 +58,7 @@ void OWM::loadForecastData() {
     int tm_yday = 0;
     int tm_year = 0;
     time_t rawTime = 0;
+    size_t i = 0;
     
     rawTime = time(NULL);
     timeInfo = localtime(&rawTime);
@@ -66,7 +69,7 @@ void OWM::loadForecastData() {
     jsonList = json_object_get(jsonResponse, "list");
     jsonListSize = json_array_size(jsonList);
     
-    for (size_t i = 0; i < jsonListSize; i++) {
+    for (; i < jsonListSize; i++) {
         jsonElement = json_array_get(jsonList, i);
         jsonObject = json_object_get(jsonElement, "dt");
         dt = json_integer_value(jsonObject);
@@ -84,7 +87,7 @@ void OWM::loadForecastData() {
     snprintf(this->iconNight, 4, json_string_value(jsonObject));
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-    for (size_t i = 0; i < jsonListSize; i++) {
+    for (; i < jsonListSize; i++) {
         jsonElement = json_array_get(jsonList, i);
         jsonObject = json_object_get(jsonElement, "dt");
         dt = json_integer_value(jsonObject);
@@ -187,27 +190,33 @@ void OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     do {
         fd = shm_open("icon", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
         if (-1 == fd) {
+            cerr << "Error: Failed to open shared memory file (errno = " << errno << ")." << endl;
             break;
         }
         result = fallocate(fd, 0, 0, fileResponse.getSize());
         if (-1 == result) {
+            cerr << "Error: Failed to allocate shared memory file (errno = " << errno << ")." << endl;
             break;
         }
         data = (char *)mmap(NULL, fileResponse.getSize(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (-1 == *data) {
+            cerr << "Error: Failed to map shared memory file (errno = " << errno << ")." << endl;
             break;
         }
         memcpy(data, fileResponse.getData(), fileResponse.getSize());
         fp = fdopen(fd, "rwb");
         if (!fp) {
+            cerr << "Error: Failed to open file (errno = " << errno << ")." << endl;
             break;
         }
         png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
         if (!png) {
+            cerr << "Error: Failed to create PNG structure." << endl;
             break;
         }
         info = png_create_info_struct(png);
         if (!info) {
+            cerr << "Error: Failed to create info structure." << endl;
             break;
         }
         png_init_io(png, fp);

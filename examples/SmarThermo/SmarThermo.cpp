@@ -108,9 +108,11 @@ int main (int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     if (signal(SIGINT, signalHandler) == SIG_ERR) {
+        cerr << "Error: Failed to hook up SIGINT handler." << endl;
         exit(EXIT_FAILURE);    
     }
     if (signal(SIGTERM, signalHandler) == SIG_ERR) {
+        cerr << "Error: Failed to hook up SIGINT handler." << endl;
         exit(EXIT_FAILURE);    
     }
     
@@ -119,7 +121,10 @@ int main (int argc, char *argv[]) {
     
     displayLogo();
     
-    thermometer.initialize();
+    if (!thermometer.initialize()) {
+        cerr << "Error: Failed to initialize thermometer." << endl;
+        exit(EXIT_FAILURE);
+    }
     temp = thermometer.read();
     while(1) {
         if (!(counter % 60)) {

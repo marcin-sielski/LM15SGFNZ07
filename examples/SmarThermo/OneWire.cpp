@@ -22,13 +22,15 @@
  * pin - Pin number where 1-Wire device sends the data.
  */
 OneWire::OneWire(int pin) {
+
     this->pin = pin;    
+
 }
 
 /**
  * Initializes 1-Wire interface.
  */
-void OneWire::initialize() {
+bool OneWire::initialize() {
 
     DIR *dir;
     struct dirent *dirent;
@@ -45,9 +47,10 @@ void OneWire::initialize() {
         }
         (void) closedir (dir);
     } else {
-        return;
+        return false;
     }
-    ds18b20Setup(this->pin, (const char *)(dev + 3));
+    return (bool)ds18b20Setup(this->pin, (const char *)(dev + 3));
+
 }
 
 /**

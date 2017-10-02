@@ -9,7 +9,10 @@
  *                        
  **********************************************************************************************************************/
 
+#include <iostream>
 #include "Buffer.h"
+
+using namespace std;
 
 /**
  * Buffer constructor.
@@ -80,8 +83,13 @@ unsigned int Buffer::getMaxSize() {
 json_t *Buffer::jsonLoads() {
 
     json_error_t error;
+    json_t *jsonObject = NULL;
     this->buffer[this->size] = 0;
-    return json_loads(this->buffer, 0, &error);
+    jsonObject = json_loads(this->buffer, 0, &error);
+    if (!jsonObject) {
+        cerr << "Error: " << error.text << endl;
+    }
+    return jsonObject;
 
 }
 
