@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- * OneWire.h                      
+ * OneWire.cpp                      
  * 
  * OneWire class implements 1-Wire interface.
  * 
@@ -22,29 +22,30 @@
  * pin - Pin number where 1-Wire device sends the data.
  */
 OneWire::OneWire(int pin) {
-    this->pin = pin;	
+    this->pin = pin;    
 }
 
 /**
  * Initializes 1-Wire interface.
  */
 void OneWire::initialize() {
+
     DIR *dir;
     struct dirent *dirent;
     char dev[16];      // Dev ID
     wiringPiSetupGpio();
     dir = opendir("/sys/bus/w1/devices");
     if (dir != NULL) {
-	while ((dirent = readdir (dir))) {
-	    // 1-wire devices are links beginning with 28-, find first
-	    if (dirent->d_type == DT_LNK && strstr(dirent->d_name, "28-") != NULL) { 
-		strcpy(dev, dirent->d_name);
-		break;
-	    }
-	}
+        while ((dirent = readdir (dir))) {
+            // 1-wire devices are links beginning with 28-, find first
+            if (dirent->d_type == DT_LNK && strstr(dirent->d_name, "28-") != NULL) { 
+                strcpy(dev, dirent->d_name);
+                break;
+            }
+        }
         (void) closedir (dir);
     } else {
-	return;
+        return;
     }
     ds18b20Setup(this->pin, (const char *)(dev + 3));
 }
@@ -56,5 +57,7 @@ void OneWire::initialize() {
  *     Data from 1-Wire device.
  */
 double OneWire::read() {
+
     return ((double)analogRead(this->pin))/10;
+
 }

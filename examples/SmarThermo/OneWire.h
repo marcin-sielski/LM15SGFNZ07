@@ -15,12 +15,12 @@
 class OneWire {
     
     private:
-	int pin;
-	
+    int pin;
+    
     public:
-	OneWire(int pin);
-	void initialize();
-	double read();
+    OneWire(int pin);
+    void initialize();
+    double read();
 
     
 };

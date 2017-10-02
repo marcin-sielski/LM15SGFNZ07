@@ -15,28 +15,28 @@
 #include "WebService.h"
 
 class OWM {
-	
-	private:
-		const char *webEndpoint = "http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=Metric";
-		const char *imageEndpoint = "http://openweathermap.org/img/w/%s.png";
-		WebService endpoint;
-		const char *apiId; 
-		const char *location;
-		double temperatureNight;
-		double temperatureDay;
-		char iconNight[4];
-		char iconDay[4];
-		
-	public:
-		OWM(const char *apiId, const char *location);
-		void loadForecastData();
-		double getTemperatureNight();
-		double getTemperatureDay();
-		void getImageBitmapNight(unsigned short color, unsigned short *bitmap); 
-		void getImageBitmapDay(unsigned short color, unsigned short *bitmap); 
+    
+    private:
+        const char *webEndpoint = "http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=Metric";
+        const char *imageEndpoint = "http://openweathermap.org/img/w/%s.png";
+        WebService endpoint;
+        const char *apiId; 
+        const char *location;
+        double temperatureNight;
+        double temperatureDay;
+        char iconNight[4];
+        char iconDay[4];
+        
+    public:
+        OWM(const char *apiId, const char *location);
+        void loadForecastData();
+        double getTemperatureNight();
+        double getTemperatureDay();
+        void getImageBitmapNight(unsigned short color, unsigned short *bitmap); 
+        void getImageBitmapDay(unsigned short color, unsigned short *bitmap); 
 
-	private:
-		void getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap); 
+    private:
+        void getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap); 
 
 };
 

@@ -1,6 +1,6 @@
 /***********************************************************************************************************************
  * 
- * WebService.h                      
+ * WebService.cpp                     
  * 
  * WebService class implements interface that helps with interactions with Web Services.
  * 
@@ -86,7 +86,7 @@ size_t WebService::writeCallback(char *ptr, size_t size, size_t nmemb, void *use
     Buffer *buffer = (Buffer *)userdata;
     
     if (buffer->getSize() + size * nmemb >= buffer->getMaxSize() - 1) {
-	return 0;
+        return 0;
     }
     memcpy(buffer->getData() + buffer->getSize(), ptr, size * nmemb);
     buffer->setSize(buffer->getSize() + size * nmemb);
@@ -110,22 +110,22 @@ bool WebService::request(const char *url, Buffer *buffer) {
     CURLcode returnValue = CURLE_OK;
 
     do {
-	returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_URL, url);
-	if (CURLE_OK != returnValue) {
-	    break;
-	}
-	returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_WRITEFUNCTION, this->writeCallback);
-	if (CURLE_OK != returnValue) {
-	    break;
-	}
-	returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_WRITEDATA, (void *)buffer);
-	if (CURLE_OK != returnValue) {
-	    break;
-	}
-	returnValue = curl_easy_perform(this->curlHandle);
-	if (CURLE_OK != returnValue) {
-	    break;		
-	}
+        returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_URL, url);
+        if (CURLE_OK != returnValue) {
+            break;
+        }
+        returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_WRITEFUNCTION, this->writeCallback);
+        if (CURLE_OK != returnValue) {
+            break;
+        }
+        returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_WRITEDATA, (void *)buffer);
+        if (CURLE_OK != returnValue) {
+            break;
+        }
+        returnValue = curl_easy_perform(this->curlHandle);
+        if (CURLE_OK != returnValue) {
+            break;        
+        }
     }
     while(0);
 
