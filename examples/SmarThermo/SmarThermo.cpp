@@ -117,8 +117,6 @@ int main (int argc, char *argv[]) {
 	OneWire thermometer(65);
 	OWM service(apiId, location);
 	
-	lcd.initialize();
-	
     displayLogo();
     
 	thermometer.initialize();
