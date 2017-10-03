@@ -272,9 +272,9 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
                 px = &(row[x * 4]);
                 alpha = (px[3] >> 4);
                 bitmap[x+y*height] = ((((px[0] >> 4) * alpha / 0xF) << 8) +
-                                     ((0xF - alpha) * ((color & 0xF00) >> 8) / 0xF)) |
+                                     (((0xF - alpha) * ((color & 0xF00) >> 8) / 0xF)) << 8) |
                                      ((((px[1] >> 4) * alpha / 0xF) << 4) +
-                                     ((0xF - alpha) * ((color & 0xF0) >> 4) / 0xF)) |
+                                     (((0xF - alpha) * ((color & 0xF0) >> 4) / 0xF)) << 4)|
                                      (((px[2] >> 4) * alpha / 0xF) + ((0xF - alpha) * (color & 0xF) / 0xF));
             }
         }
