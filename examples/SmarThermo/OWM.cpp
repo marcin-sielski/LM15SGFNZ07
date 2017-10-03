@@ -16,6 +16,7 @@
 #include <cstring>
 #include <png.h>
 #include <iostream>
+#include <unistd.h>
 
 #include "OWM.h"
 
@@ -223,7 +224,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
             returnValue = false;
             break;
         }
-        result = fallocate(fd, 0, 0, fileResponse.getSize());
+        result = ftruncate(fd, fileResponse.getSize());
         if (-1 == result) {
             cerr << "Error: Failed to allocate shared memory file (errno = " << errno << ")." << endl;
             returnValue = false;
@@ -295,6 +296,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     }
     if (-1 != fd) {
         shm_unlink("icon");
+        close(fd);
     }
     
     return returnValue;
