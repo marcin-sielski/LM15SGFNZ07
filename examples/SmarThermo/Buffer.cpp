@@ -87,7 +87,7 @@ json_t *Buffer::jsonLoads() {
     this->buffer[this->size] = 0;
     jsonObject = json_loads(this->buffer, 0, &error);
     if (!jsonObject) {
-        cerr << "Error: " << error.text << endl;
+        cerr << "Error: " << error.text << "." << endl;
     }
     return jsonObject;
 
