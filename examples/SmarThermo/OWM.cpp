@@ -280,12 +280,12 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
         }
     }
     while(0);
-    for(int y = 0; y < height; y++) {
-        if (!rowPointers[y]) {
-            free(rowPointers[y]);
-        }
-    }
     if (!rowPointers) {
+        for(int y = 0; y < height; y++) {
+            if (!rowPointers[y]) {
+                free(rowPointers[y]);
+            }
+        }
         free(rowPointers);
     }
     if (!fp) {
