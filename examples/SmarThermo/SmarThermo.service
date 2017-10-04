@@ -3,6 +3,7 @@ Description=SmarThermo service
 After=syslog.target
 
 [Service]
+Restart=always
 Type=simple
 User=root
 Group=root

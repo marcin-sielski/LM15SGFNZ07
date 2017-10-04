@@ -194,6 +194,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     int result = 0;
     char *data = NULL;
     FILE *fp = NULL;
+    unsigned char header[8];
     png_structp png;
     png_infop info;
     int width = 0;
@@ -208,6 +209,9 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     unsigned int timeout = 10000;
     
     if (!image) {
+        return false;
+    }
+    if (!bitmap) {
         return false;
     }
     
@@ -243,12 +247,18 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
             returnValue = false;
             break;
         }
+        fread((void *)header, 1, 8, fp);
+        if (png_sig_cmp((const unsigned char*)header, 0, 8)) {
+            cerr << "Error: Not a PNG file." << endl;
+            break;
+        }
         png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
         if (!png) {
             cerr << "Error: Failed to create PNG structure." << endl;
             returnValue = false;
             break;
         }
+        png_set_sig_bytes(png, 8);
         info = png_create_info_struct(png);
         if (!info) {
             cerr << "Error: Failed to create info structure." << endl;
