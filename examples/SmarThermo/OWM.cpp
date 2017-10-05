@@ -250,6 +250,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
         fread((void *)header, 1, 8, fp);
         if (png_sig_cmp((const unsigned char*)header, 0, 8)) {
             cerr << "Error: Not a PNG file." << endl;
+            returnValue = false;
             break;
         }
         png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
