@@ -195,15 +195,15 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     char *data = NULL;
     FILE *fp = NULL;
     unsigned char header[8];
-    png_structp png;
-    png_infop info;
+    png_structp png = NULL;
+    png_infop info = NULL;
     int width = 0;
     int height = 0;
     png_byte colorType;
     png_byte bitDepth;
     png_bytep *rowPointers = NULL;
-    png_bytep row;
-    png_bytep px;
+    png_bytep row = NULL;
+    png_bytep px = NULL;
     png_byte alpha;
     bool returnValue = true;
     unsigned int timeout = 10000;
@@ -298,6 +298,13 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
             }
         }
         free(rowPointers);
+    }
+    if (NULL == info) {
+        if (NULL != png) {
+            png_destroy_read_struct(&png, NULL, NULL);
+        }
+    } else if (NULL != png) {
+        png_destroy_read_struct(&png, &info, NULL);
     }
     if (!fp) {
         fclose(fp);
