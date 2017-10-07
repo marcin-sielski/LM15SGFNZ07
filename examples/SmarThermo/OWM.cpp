@@ -64,7 +64,7 @@ bool OWM::loadForecastData() {
     unsigned int timeout = 10000;
     
     snprintf(url, 128, webEndpoint, this->location, this->apiId);
-    while(!endpoint.requestJson(url, &jsonResponse) && timeout) timeout--;
+    while(timeout && !endpoint.requestJson(url, &jsonResponse)) timeout--;
     if (!timeout) {
         return false;
     }
@@ -299,14 +299,14 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
         }
         free(rowPointers);
     }
-    if (NULL == info) {
-        if (NULL != png) {
+    if (!info) {
+        if (png) {
             png_destroy_read_struct(&png, NULL, NULL);
         }
-    } else if (NULL != png) {
+    } else if (png) {
         png_destroy_read_struct(&png, &info, NULL);
     }
-    if (!fp) {
+    if (fp) {
         fclose(fp);
     }
     if (-1 != *data) {
