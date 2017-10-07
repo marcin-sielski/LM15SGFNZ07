@@ -216,7 +216,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     }
     
     snprintf(url, 128, imageEndpoint, image);
-    while(!endpoint.requestFile(url, &fileResponse) && timeout) timeout --;
+    while(timeout && !endpoint.requestFile(url, &fileResponse)) timeout --;
     if (!timeout) {
         return false;
     }
