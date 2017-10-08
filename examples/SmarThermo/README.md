@@ -2,4 +2,4 @@
 
 ## Schematic diagram
 
-<img src="/SmarThermo.jpg"/>
+<img src="./SmarThermo.jpg"/>
