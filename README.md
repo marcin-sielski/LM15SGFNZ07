@@ -29,8 +29,9 @@ Build the library and examples:
 cd LM15SGFNZ07
 make
 ```
-In order to be able to run **_SmarThermo_** example create an account on [Open Weather Map](http://openweathermap.org/)
-service, obtain the API key and create `/home/pi/.SmarThermo` file with the following content:
+In order to be able to run [SmarThermo](https://github.com/marcin-sielski/LM15SGFNZ07/tree/master/examples/SmarThermo)
+example create an account on [Open Weather Map](http://openweathermap.org/) service, obtain the API key and create
+`/home/pi/.SmarThermo` file with the following content:
 ```
 ApiKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Location CityName,CountryCode      
