@@ -12,23 +12,20 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include <jansson.h>
-
 class Buffer {
     
     private:
-    char *buffer;
-    unsigned int size;
-    unsigned int maxSize;
+        char *buffer;
+        unsigned int size;
+        unsigned int maxSize;
     
     public:
-    Buffer(unsigned int maxSize);
-    char *getData();
-    unsigned int getSize();
-    void setSize(unsigned int size);
-    unsigned int getMaxSize();
-    json_t *jsonLoads();
-    ~Buffer();
+        Buffer(unsigned int maxSize);
+        char *getData();
+        unsigned int getSize();
+        void setSize(unsigned int size);
+        unsigned int getMaxSize();
+        ~Buffer();
     
 };
 

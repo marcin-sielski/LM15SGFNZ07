@@ -17,6 +17,7 @@
 #include <png.h>
 #include <iostream>
 #include <unistd.h>
+#include <jansson.h>
 
 #include "OWM.h"
 
@@ -49,6 +50,8 @@ OWM::OWM(const char *apiId, const char *location) {
 bool OWM::loadForecastData() {
 
     char url[128];
+    Buffer response(256 * 1024);
+    json_error_t error;
     json_t *jsonResponse = NULL;
     json_t *jsonList = NULL;
     json_t *jsonElement = NULL;
@@ -64,8 +67,14 @@ bool OWM::loadForecastData() {
     unsigned int timeout = 10000;
     
     snprintf(url, 128, webEndpoint, this->location, this->apiId);
-    while(timeout && !endpoint.requestJson(url, &jsonResponse)) timeout--;
+    while(timeout && !endpoint.request(url, &response)) timeout--;
     if (!timeout) {
+        return false;
+    }
+    response.getData()[response.getSize()] = 0;
+    jsonResponse = json_loads(response.getData(), 0, &error);
+    if (!jsonResponse) {
+        cerr << "Error: " << error.text << "." << endl;
         return false;
     }
     
@@ -189,7 +198,7 @@ bool OWM::getImageBitmapDay(unsigned short color, unsigned short *bitmap) {
 bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short *bitmap) {
     
     char url[128];
-    Buffer fileResponse(256 * 1024);
+    Buffer response(256 * 1024);
     int fd = 0;
     int result = 0;
     char *data = NULL;
@@ -216,7 +225,7 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     }
     
     snprintf(url, 128, imageEndpoint, image);
-    while(timeout && !endpoint.requestFile(url, &fileResponse)) timeout --;
+    while(timeout && !endpoint.request(url, &response)) timeout --;
     if (!timeout) {
         return false;
     }
@@ -228,19 +237,19 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
             returnValue = false;
             break;
         }
-        result = ftruncate(fd, fileResponse.getSize());
+        result = ftruncate(fd, response.getSize());
         if (-1 == result) {
             cerr << "Error: Failed to allocate shared memory file (errno = " << errno << ")." << endl;
             returnValue = false;
             break;
         }
-        data = (char *)mmap(NULL, fileResponse.getSize(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        data = (char *)mmap(NULL, response.getSize(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (-1 == *data) {
             cerr << "Error: Failed to map shared memory file (errno = " << errno << ")." << endl;
             returnValue = false;
             break;
         }
-        memcpy(data, fileResponse.getData(), fileResponse.getSize());
+        memcpy(data, response.getData(), response.getSize());
         fp = fdopen(fd, "rwb");
         if (!fp) {
             cerr << "Error: Failed to open file (errno = " << errno << ")." << endl;
@@ -291,9 +300,9 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
         }
     }
     while(0);
-    if (!rowPointers) {
+    if (rowPointers) {
         for(int y = 0; y < height; y++) {
-            if (!rowPointers[y]) {
+            if (rowPointers[y]) {
                 free(rowPointers[y]);
             }
         }
@@ -302,15 +311,19 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
     if (!info) {
         if (png) {
             png_destroy_read_struct(&png, NULL, NULL);
+            png = NULL;
         }
     } else if (png) {
         png_destroy_read_struct(&png, &info, NULL);
+        png = NULL;
+        info = NULL;
     }
     if (fp) {
         fclose(fp);
+        fp = NULL;
     }
     if (-1 != *data) {
-        munmap(data, fileResponse.getSize());
+        munmap(data, response.getSize());
     }
     if (-1 != fd) {
         shm_unlink("icon");

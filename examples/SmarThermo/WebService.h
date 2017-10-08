@@ -14,24 +14,21 @@
 #define WEBSERVICE_H
 
 #include <curl/curl.h>
-#include <jansson.h>
 
 #include "Buffer.h"
 
 class WebService {
     
     private:
-	CURL *curlHandle;
-	
+        CURL *curlHandle;
+
     public:
-	WebService();
-	bool requestJson(const char *url, json_t **response);
-	bool requestFile(const char *url, Buffer *response);
-	~WebService();
+        WebService();
+        bool request(const char *url, Buffer *buffer);
+        ~WebService();
 	
     private:
-	static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
-	bool request(const char *url, Buffer *buffer);
+        static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 
 };
 

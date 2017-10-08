@@ -9,10 +9,7 @@
  *                        
  **********************************************************************************************************************/
 
-#include <iostream>
 #include "Buffer.h"
-
-using namespace std;
 
 /**
  * Buffer constructor.
@@ -58,6 +55,9 @@ unsigned int Buffer::getSize() {
  */
 void Buffer::setSize(unsigned int size) {
 
+    if (size > this->maxSize) {
+        size = maxSize;
+    }
     this->size = size;
 
 }
@@ -71,25 +71,6 @@ void Buffer::setSize(unsigned int size) {
 unsigned int Buffer::getMaxSize() {
 
     return this->maxSize;
-
-}
-
-/**
- * Gets buffer data in JSON object.
- * 
- * Returns:
- *     Buffer data in JSON object. 
- */
-json_t *Buffer::jsonLoads() {
-
-    json_error_t error;
-    json_t *jsonObject = NULL;
-    this->buffer[this->size] = 0;
-    jsonObject = json_loads(this->buffer, 0, &error);
-    if (!jsonObject) {
-        cerr << "Error: " << error.text << "." << endl;
-    }
-    return jsonObject;
 
 }
 
