@@ -1,7 +1,7 @@
 # SmarThermo example
 
 ## Overview
-This project introduces smart thermometer which leverage 1-wire temerature sensor and WiFi connection to get whether
+This project introduces smart thermometer which leverages 1-wire temerature sensor and WiFi connection to get whether
 forecast for the closest night and the next day.
 
 ## Components
