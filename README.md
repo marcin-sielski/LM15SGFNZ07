@@ -36,6 +36,8 @@ example create an account on [Open Weather Map](http://openweathermap.org/) serv
 ApiKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Location CityName,CountryCode      
 ```
+and enable 1-wire interface with `raspi-config`.
+
 Install the library and the examples:
 ```
 sudo make install
