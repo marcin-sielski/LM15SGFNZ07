@@ -130,7 +130,7 @@ int main (int argc, char *argv[]) {
     while(1) {
         if (!(counter % 60)) {
             result = service.loadForecastData();
-            if (counter == 0) {
+            if (!(counter % 3600)) {
                 lcd.clearAll(BACKGROUND_COLOR);
             }
             if (result) {
