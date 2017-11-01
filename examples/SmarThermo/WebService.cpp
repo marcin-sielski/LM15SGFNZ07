@@ -51,6 +51,10 @@ bool WebService::request(const char *url, Buffer *buffer) {
         if (CURLE_OK != returnValue) {
             break;
         }
+        returnValue = curl_easy_setopt(this->curlHandle, CURLOPT_TIMEOUT, 20L);
+        if (CURLE_OK != returnValue) {
+            break;
+        }
         returnValue = curl_easy_perform(this->curlHandle);
         if (CURLE_OK != returnValue) {
             break;        
