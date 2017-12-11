@@ -54,7 +54,6 @@ int main (int argc, char *argv[]) {
     const char *apiId = NULL;
     const char *location = NULL;
     const char *config = NULL;
-    unsigned int indentation = 0;
     bool result = false;
 
     // Parse arguments
@@ -158,13 +157,8 @@ int main (int argc, char *argv[]) {
             strftime(buffer, 18, "%H %M  %d/%m/%Y", timeinfo);
         }
         lcd.printString(buffer, 0, 0, 1, YELLOW, BACKGROUND_COLOR);
-        snprintf(temperature, 8, "%.1f C", temp);
-        if (((temp > -10) && (temp < 0)) || (temp >= 10)) {
-            indentation = 1;
-        } else if (temp >= 0) {
-            indentation = 2;
-        }
-        lcd.printString(temperature, indentation, 1, 2, YELLOW, BACKGROUND_COLOR);
+        snprintf(temperature, 8, "%5.1f C", temp);
+        lcd.printString(temperature, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
         lcd.printString("O", 11, 2, 1, YELLOW, BACKGROUND_COLOR);
         temp = thermometer.read();
         counter++;
