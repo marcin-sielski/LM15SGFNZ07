@@ -33,8 +33,8 @@ In order to be able to run [SmarThermo](https://github.com/marcin-sielski/LM15SG
 example create an account on [Open Weather Map](http://openweathermap.org/) service, obtain the API key, create
 `/home/pi/.SmarThermo` file with the following content:
 ```
-ApiKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Location CityName,CountryCode      
+OWMApiKey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+OWMLocation CityName,CountryCode 
 ```
 and enable 1-wire interface with `raspi-config`.
 

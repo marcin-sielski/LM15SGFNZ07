@@ -4,7 +4,7 @@
  * 
  * Main application.
  * 
- * Copyright (C) 2017 Marcin Sielski
+ * Copyright (C) 2019 Marcin Sielski
  *  
  * This work is licensed under the terms of the GNU General Public License Version 3.
  *                        
@@ -20,6 +20,7 @@
 #include <LM15SGFNZ07.h>
 #include "OneWire.h"
 #include "OWM.h"
+#include "Hazyair.h"
 
 using namespace std;
 
@@ -43,27 +44,33 @@ static void signalHandler(int signo) {
 int main (int argc, char *argv[]) {
     
     char url[256];
-    char temperature[8];
+    char output[8];
+    double temperature = 0;
     char buffer[18];
-    double temp = 0;
     unsigned int counter = 0;
     time_t rawtime = 0;
     struct tm *timeinfo = NULL;
     unsigned short bitmap[2500];
     int opt = 0;
-    const char *apiId = NULL;
-    const char *location = NULL;
+    const char *owmApiKey = NULL;
+    const char *owmLocation = NULL;
+    const char *hazyairAddress = NULL;
     const char *config = NULL;
+    bool external = true;
     bool result = false;
+    unsigned int dust = 0;
 
     // Parse arguments
-    while ((opt = getopt(argc, argv, "k:l:c:h?")) != -1) {
+    while ((opt = getopt(argc, argv, "k:l:a:c:h?")) != -1) {
         switch (opt) {
         case 'k':
-            apiId = optarg;
+            owmApiKey = optarg;
             break;
         case 'l':
-            location = optarg;
+            owmLocation = optarg;
+            break;
+        case 'a':
+            hazyairAddress = optarg;
             break;
         case 'c':
             config = optarg;
@@ -71,13 +78,13 @@ int main (int argc, char *argv[]) {
         case 'h':
         case '?':
         default: /* '?' */
-            cerr << "Usage: " << argv[0] << " [-k ApiKey] [-l Location] [-c Config]" << endl;
+            cerr << "Usage: " << argv[0] << " [-k OWMApiKey] [-l OWMLocation] [-a HazyairAddress] [-c Config]" << endl;
             exit(EXIT_FAILURE);
         }
     }
     
     // Parse configuration file
-    string sApiId, sLocation;
+    string sOWMApiKey, sOWMLocation, sHazyairAddress;
     if (config != NULL) {
         ifstream configFile(config);
         if (configFile) {
@@ -89,22 +96,27 @@ int main (int argc, char *argv[]) {
                 istringstream issLine(line);
                 string key;
                 if (getline(issLine, key, ' ')) {
-                    if (!key.compare("ApiKey")) {
-                        if (getline(issLine, sApiId)) {
-                            apiId = sApiId.c_str();
+                    if (!key.compare("OWMApiKey")) {
+                        if (getline(issLine, sOWMApiKey)) {
+                            owmApiKey = sOWMApiKey.c_str();
                         }
                     }
-                    if (!key.compare("Location")) {
-                        if (getline(issLine, sLocation)) {
-                            location = sLocation.c_str();
+                    if (!key.compare("OWMLocation")) {
+                        if (getline(issLine, sOWMLocation)) {
+                            owmLocation = sOWMLocation.c_str();
+                        }
+                    }
+                    if (!key.compare("HazyairAddress")) {
+                        if (getline(issLine, sHazyairAddress)) {
+                            hazyairAddress = sHazyairAddress.c_str();
                         }
                     }
                 }
             }
         }
     }
-    if (apiId == NULL || location == NULL) {
-        cerr << "Usage: " << argv[0] << " [-k ApiKey] [-l Location] [-c Config]" << endl;
+    if (owmApiKey == NULL || owmLocation == NULL) {
+        cerr << "Usage: " << argv[0] << " [-k OWMApiKey] [-l OWMLocation] [-a HazyairAddress] [-c Config]" << endl;
         exit(EXIT_FAILURE);
     }
     if (signal(SIGINT, signalHandler) == SIG_ERR) {
@@ -117,7 +129,8 @@ int main (int argc, char *argv[]) {
     }
     
     OneWire thermometer(65);
-    OWM service(apiId, location);
+    OWM owm(owmApiKey, owmLocation);
+    Hazyair hazyair(hazyairAddress);
     
     displayLogo();
     
@@ -125,30 +138,23 @@ int main (int argc, char *argv[]) {
         cerr << "Error: Failed to initialize thermometer." << endl;
         exit(EXIT_FAILURE);
     }
-    temp = thermometer.read();
+
+    temperature = thermometer.read();
+
     while(1) {
-        if (!(counter % 60)) {
-            result = service.loadForecastData();
+        
+        // clean
+        if (hazyairAddress == NULL) {
             if (!(counter % 3600)) {
                 lcd.clearAll(BACKGROUND_COLOR);
             }
-            if (result) {
-                if (service.getImageBitmapNight(BACKGROUND_COLOR, bitmap)) {
-                    lcd.drawBitmap(0,31,50,50, bitmap);
-                }
-                snprintf(temperature, 8, "%.1f C", service.getTemperatureNight());
-                lcd.drawString(temperature, 13, 71, YELLOW, BACKGROUND_COLOR);
-
-                if (service.getImageBitmapDay(BACKGROUND_COLOR, bitmap)) {
-                    lcd.drawBitmap(51,31,50,50, bitmap);
-                }
-                snprintf(temperature, 8, "%.1f C", service.getTemperatureDay());
-                lcd.drawString(temperature, 64, 71, YELLOW, BACKGROUND_COLOR);
-            
-                lcd.drawLine(0, 39, 100, 39, YELLOW);
-                lcd.drawLine(50, 40, 50, 79, YELLOW);
+        } else {
+            if (!(counter % 10)) {
+                lcd.clearAll(BACKGROUND_COLOR);
             }
         }
+
+        // time
         time(&rawtime);
         timeinfo = localtime(&rawtime);
         if (counter % 2) {
@@ -157,10 +163,60 @@ int main (int argc, char *argv[]) {
             strftime(buffer, 18, "%H %M  %d/%m/%Y", timeinfo);
         }
         lcd.printString(buffer, 0, 0, 1, YELLOW, BACKGROUND_COLOR);
-        snprintf(temperature, 8, "%5.1f C", temp);
-        lcd.printString(temperature, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
-        lcd.printString("O", 11, 2, 1, YELLOW, BACKGROUND_COLOR);
-        temp = thermometer.read();
+
+        if ((hazyairAddress != NULL) && !(counter % 10) && counter != 0) external = !external;
+        if (external) {
+            
+            // forecast
+            if (!(counter % 10)) {
+                result = owm.loadForecastData();
+                if (result) {
+                    if (owm.getImageBitmapNight(BACKGROUND_COLOR, bitmap)) {
+                        lcd.drawBitmap(0,31,50,50, bitmap);
+                    }
+                    snprintf(output, 8, "%.1f C", owm.getTemperatureNight());
+                    lcd.drawString(output, 13, 71, YELLOW, BACKGROUND_COLOR);
+
+                    if (owm.getImageBitmapDay(BACKGROUND_COLOR, bitmap)) {
+                        lcd.drawBitmap(51,31,50,50, bitmap);
+                    }
+                    snprintf(output, 8, "%.1f C", owm.getTemperatureDay());
+                    lcd.drawString(output, 64, 71, YELLOW, BACKGROUND_COLOR);
+            
+                    lcd.drawLine(0, 39, 100, 39, YELLOW);
+                    lcd.drawLine(50, 40, 50, 79, YELLOW);
+                }
+            }
+
+            // temperature
+            snprintf(output, 8, "%5.1f C", temperature);
+            lcd.printString(output, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
+            lcd.printString("O", 11, 2, 1, YELLOW, BACKGROUND_COLOR);
+            temperature = thermometer.read();
+
+        } else if (hazyair.loadData()) {
+            
+            snprintf(output, 8, "%5.1f C", hazyair.getTemperature());
+            lcd.printString(output, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
+            lcd.printString("O", 11, 2, 1, YELLOW, BACKGROUND_COLOR);
+            
+            lcd.drawLine(0, 39, 100, 39, YELLOW);
+            lcd.drawLine(50, 40, 50, 79, YELLOW);
+
+            dust = hazyair.getDust();
+            snprintf(output, 8, "%3d ", dust);
+            lcd.printString(output, 0, 3, 2, (dust <= 13 ? 0x0C0 : (dust <= 37 ? LIME : (dust <= 61 ? YELLOW :
+            (dust <= 85 ? OLIVE : (dust <= 121 ? RED : DARK_RED ))))), BACKGROUND_COLOR);
+            lcd.drawString("ug/m^3", 10, 71, YELLOW, BACKGROUND_COLOR);
+            
+            snprintf(output, 8, "%2d", hazyair.getHumidity());
+            lcd.printString(output, 5, 3, 2, YELLOW, BACKGROUND_COLOR);
+            lcd.drawString("%", 70, 71, YELLOW, BACKGROUND_COLOR);
+            
+            sleep(1);
+               
+        } else external = true;
+
         counter++;
     }
     return 0;

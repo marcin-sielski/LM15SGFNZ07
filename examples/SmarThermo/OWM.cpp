@@ -3,7 +3,7 @@
  * 
  * OWM class implements Open Weather Map interface (https://openweathermap.org/).
  * 
- * Copyright (C) 2017 Marcin Sielski
+ * Copyright (C) 2019 Marcin Sielski
  *  
  * This work is licensed under the terms of the GNU General Public License Version 3.
  *                        
@@ -66,8 +66,8 @@ bool OWM::loadForecastData() {
     size_t i = 0;
     unsigned int timeout = 10000;
     
-    snprintf(url, 128, webEndpoint, this->location, this->apiId);
-    while(timeout && !endpoint.request(url, &response)) timeout--;
+    snprintf(url, 128, this->webEndpoint, this->location, this->apiId);
+    while(timeout && !this->endpoint.request(url, &response)) timeout--;
     if (!timeout) {
         return false;
     }
@@ -183,7 +183,6 @@ bool OWM::getImageBitmapDay(unsigned short color, unsigned short *bitmap) {
 
 }
 
-
 /**
  * Return bitmap of the image.
  * 
@@ -224,8 +223,8 @@ bool OWM::getImageBitmap(const char *image, unsigned short color, unsigned short
         return false;
     }
     
-    snprintf(url, 128, imageEndpoint, image);
-    while(timeout && !endpoint.request(url, &response)) timeout --;
+    snprintf(url, 128, this->imageEndpoint, image);
+    while(timeout && !this->endpoint.request(url, &response)) timeout --;
     if (!timeout) {
         return false;
     }

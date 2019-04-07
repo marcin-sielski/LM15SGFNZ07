@@ -13,7 +13,7 @@ DIRS = $(OBJDIR) $(OUTDIR)
 CFLAGS = -I$(INCDIR)
 LDFLAGS = -L$(LIBDIR) -lLM15SGFNZ07 -lcurl -ljansson -lwiringPi -lrt -lpng
 TARGET = SmarThermo
-_OBJ = Buffer.o OWM.o OneWire.o SmarThermo.o WebService.o 
+_OBJ = Buffer.o OWM.o OneWire.o SmarThermo.o WebService.o Hazyair.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 all: $(OUTDIR)/$(TARGET)
@@ -32,6 +32,7 @@ install:
 	$(CP) $(TARGET).service $(SYSDIR)
 	$(SYSTEMCTL) enable $(TARGET).service
 	$(SYSTEMCTL) start $(TARGET).service
+	$(SYSTEMCTL) status $(TARGET).service
 	
 uninstall:
 	-$(SYSTEMCTL) stop $(TARGET).service
