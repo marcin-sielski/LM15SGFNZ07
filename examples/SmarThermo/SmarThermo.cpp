@@ -143,33 +143,20 @@ int main (int argc, char *argv[]) {
 
     while(1) {
         
-        // clean
-        if (hazyairAddress == NULL) {
-            if (!(counter % 3600)) {
-                lcd.clearAll(BACKGROUND_COLOR);
-            }
-        } else {
-            if (!(counter % 10)) {
-                lcd.clearAll(BACKGROUND_COLOR);
-            }
-        }
-
-        // time
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        if (counter % 2) {
-            strftime(buffer, 18, "%H:%M  %d/%m/%Y", timeinfo);
-        } else {
-            strftime(buffer, 18, "%H %M  %d/%m/%Y", timeinfo);
-        }
-        lcd.printString(buffer, 0, 0, 1, YELLOW, BACKGROUND_COLOR);
-
         if ((hazyairAddress != NULL) && !(counter % 10) && counter != 0) external = !external;
         if (external) {
             
             // forecast
             if (!(counter % 10)) {
                 result = owm.loadForecastData();
+
+                // clean
+                if (hazyairAddress == NULL) {
+                    if (!(counter % 3600)) {
+                        lcd.clearAll(BACKGROUND_COLOR);
+                    }
+                } else lcd.clearAll(BACKGROUND_COLOR);
+                
                 if (result) {
                     if (owm.getImageBitmapNight(BACKGROUND_COLOR, bitmap)) {
                         lcd.drawBitmap(0,31,50,50, bitmap);
@@ -188,6 +175,16 @@ int main (int argc, char *argv[]) {
                 }
             }
 
+            // time
+            time(&rawtime);
+            timeinfo = localtime(&rawtime);
+            if (counter % 2) {
+                strftime(buffer, 18, "%H:%M  %d/%m/%Y", timeinfo);
+            } else {
+                strftime(buffer, 18, "%H %M  %d/%m/%Y", timeinfo);
+            }
+            lcd.printString(buffer, 0, 0, 1, YELLOW, BACKGROUND_COLOR);
+
             // temperature
             snprintf(output, 8, "%5.1f C", temperature);
             lcd.printString(output, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
@@ -195,6 +192,19 @@ int main (int argc, char *argv[]) {
             temperature = thermometer.read();
 
         } else if (hazyair.loadData()) {
+            
+            if (!(counter % 10)) lcd.clearAll(BACKGROUND_COLOR);
+
+            // time
+            time(&rawtime);
+            timeinfo = localtime(&rawtime);
+            if (counter % 2) {
+                strftime(buffer, 18, "%H:%M  %d/%m/%Y", timeinfo);
+            } else {
+                strftime(buffer, 18, "%H %M  %d/%m/%Y", timeinfo);
+            }
+            lcd.printString(buffer, 0, 0, 1, YELLOW, BACKGROUND_COLOR);
+
             
             snprintf(output, 8, "%5.1f C", hazyair.getTemperature());
             lcd.printString(output, 0, 1, 2, YELLOW, BACKGROUND_COLOR);
@@ -213,7 +223,7 @@ int main (int argc, char *argv[]) {
             lcd.printString(output, 5, 3, 2, YELLOW, BACKGROUND_COLOR);
             lcd.drawString("%", 70, 71, YELLOW, BACKGROUND_COLOR);
             
-            sleep(1);
+            usleep(800000);
                
         } else external = true;
 
