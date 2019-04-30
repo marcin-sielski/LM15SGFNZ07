@@ -104,7 +104,7 @@ bool Hazyair::requestData(const char *parameter, const char *name, double *resul
 
     snprintf(url, 128, this->webEndpoint, this->address, parameter);
     while(timeout && !this->endpoint.request(url, &response)) timeout--;
-    if (!timeout) {
+    if (!timeout || response.getSize() <= 2) {
         return false;
     }
     response.getData()[response.getSize()] = 0;

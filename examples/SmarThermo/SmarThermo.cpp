@@ -225,7 +225,7 @@ int main (int argc, char *argv[]) {
             
             usleep(800000);
                
-        } else external = true;
+        } else external = false;
 
         counter++;
     }
